@@ -17,7 +17,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '17'
-          distribution: 'adopt'
+          distribution: 'corretto'
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
@@ -45,7 +45,11 @@ jobs:
           port: 22
           script_stop: true
           script: |
-            sudo apt-get update -y && sudo apt-get install -y java-17-amazon-corretto
+            curl -fsSL https://apt.corretto.aws/corretto.key | sudo tee /etc/apt/trusted.gpg.d/corretto.asc
+            echo 'deb https://apt.corretto.aws stable main' | sudo tee /etc/apt/sources.list.d/corretto.list
+            sudo apt-get update -y
+            sudo apt-get install -y java-17-amazon-corretto-jdk
+            
             for pid in $(pgrep java); do
               if ps -p $pid -o args= | grep -q 'java -jar'; then
                 echo "Java process with 'java -jar' found (PID: $pid). Terminating..."
